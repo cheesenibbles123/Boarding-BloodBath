@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
-using BWModLoader;
+using ModLoader;
 using Harmony;
 using System.Reflection;
 using System.IO;
@@ -58,17 +58,32 @@ namespace BoardingBloodbath
                 Log.log("##### Source #####");
                 Log.log(e.Source);
             }
-            GameMode.Instance.resetEvent += this.reset;
-            GameMode.Instance.resetEvent += ShipsHandler.Reset;
-            Log.log("Setup reset event");
-            wno = UI.Instance.chatbox.GetComponent<WakeNetObject>();
-            Log.log("Make new wakenet object");
+            Log.log("Setting up resets");
+            Instance.StartCoroutine(Instance.waitForGamemodeInstance());
             loadSettings();
             Log.log("Loaded settings");
         }
 
+        private IEnumerator waitForGamemodeInstance()
+        {
+            Log.log("waiting for gamemode instance");
+            while (!GameMode.Instance)
+            {
+                Log.log("Checking instance");
+                yield return new WaitForSeconds(2f);
+            }
+            Log.log("Instance Found");
+
+            GameMode.Instance.resetEvent += this.reset;
+            GameMode.Instance.resetEvent += ShipsHandler.Reset;
+            Log.log("Setup reset event");
+            wno = UI.Instance.chatbox.GetComponent<WakeNetObject>();
+            Log.log("Got wakenet object");
+        }
+
         public void reset()
         {
+            Log.log("reset called, switching: " + BoardingBloodbathModeHandler.voteSucceded);
             started = false;
             if (BoardingBloodbathModeHandler.voteSucceded)
             {
@@ -86,7 +101,7 @@ namespace BoardingBloodbath
 
         void generateSettings()
         {
-            StreamWriter streamWriter = new StreamWriter(configFile);
+            StreamWriter streamWriter = new StreamWriter(ModLoader.ModLoader.FolderPath + configFile);
             streamWriter.WriteLine("navyTickets=" + navyTickets);
             streamWriter.WriteLine("pirateTickets=" + pirateTickets);
             streamWriter.WriteLine("respawnTimer=" + respawnTimer);
@@ -95,12 +110,15 @@ namespace BoardingBloodbath
 
         public void loadSettings()
         {
-            if (!File.Exists(configFile))
+            Log.log("Loading Settings: " + ModLoader.ModLoader.FolderPath + configFile);
+            if (!File.Exists(ModLoader.ModLoader.FolderPath + configFile))
             {
                 generateSettings();
             }
-            string[] allLines = File.ReadAllLines(configFile);
+
+            string[] allLines = File.ReadAllLines(ModLoader.ModLoader.FolderPath + configFile);
             char splitCharacter = '=';
+
             for (int i=0; i<allLines.Length; i++)
             {
                 if (allLines[i].Contains("="))
@@ -125,8 +143,10 @@ namespace BoardingBloodbath
                     }
                 }
             }
+
             navySteps = (int)(100 % ((10f / navyTickets) * 100));
             pirateSteps = (int)(100 % ((10f / pirateTickets) * 100));
+            Log.log("Loaded Settings");
         }
 
         void setTickets(int pirate, int navy)
@@ -150,6 +170,7 @@ namespace BoardingBloodbath
         public static void selectNextPreset()
         {
             Instance.nextPreset = UnityEngine.Random.Range(0, Instance.presets.Count - 1);
+            Log.log("Next preset selected");
         }
 
         void setupPresets()

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using BWModLoader;
+using ModLoader;
 using UnityEngine;
 
 namespace BoardingBloodbath
@@ -67,8 +67,10 @@ namespace BoardingBloodbath
 
         public static void vote(string pName, int pSocket)
         {
+            Log.log("Handler - Got vote");
             if (usersVoted.Contains(pName))
             {
+                Log.log("Already voted");
                 BoardingBloodbathGameMode.Instance.wno.òäóæåòîððòä("broadcastChat", pSocket, new object[]
                 {
                         1,
@@ -80,7 +82,7 @@ namespace BoardingBloodbath
             else
             {
                 usersVoted.Add(pName);
-
+                Log.log("New voter");
                 // To User only
                 BoardingBloodbathGameMode.Instance.wno.òäóæåòîððòä("broadcastChat", pSocket, new object[]
                 {

@@ -45,6 +45,7 @@ namespace BoardingBloodbath
 			if (BoardingBloodbathModeHandler.voteSucceded)
 			{
 				__result = 1;
+				Log.logger.Log("Overwrote gamemode to 1");
 			}
 		}
 	}
@@ -87,18 +88,16 @@ namespace BoardingBloodbath
 		private static bool Prefix(int chatType, int senderTeam, string sender, string text, ïçîìäîóäìïæ.åéðñðçîîïêç info)
 		{
 			Log.log("Chat patch called");
-			PlayerInfo playerBySocket = GameMode.getPlayerBySocket(info.éäñåíéíìééä);
-			text = text.ToLower();
-			Log.log(text);
+			string checkText = text.ToLower();
 
 			ulong steamID = GameMode.getPlayerBySocket(info.éäñåíéíìééä).steamPlayer.ðñéèéåóëìêé.m_SteamID;
 			bool isAdmin = éæñêääóîîèò.ðïîñðçòäêëæ(steamID);
 			if (isAdmin)
 			{
-				if (text.StartsWith("!force bb"))
+				if (checkText.StartsWith("!force bb"))
 				{
 					Log.log("Force command used");
-					string[] parameters = text.Split(new char[] { ' ' });
+					string[] parameters = checkText.Split(new char[] { ' ' });
 					if (parameters.Length >= 3)
 					{
 						int.TryParse(parameters[2], out int nextPreset);
@@ -110,7 +109,7 @@ namespace BoardingBloodbath
 					}
 					return false;
 				}
-				else if (text.StartsWith("!reload bb"))
+				else if (checkText.StartsWith("!reload bb"))
                 {
 					Log.log("Reloading config");
 					BoardingBloodbathGameMode.Instance.loadSettings();
@@ -118,7 +117,7 @@ namespace BoardingBloodbath
 				}
 			}
 
-			if (text.StartsWith("!vote bb"))
+			if (checkText.StartsWith("!vote bb"))
             {
 				Log.log("Got vote");
 				BoardingBloodbathModeHandler.vote(sender, info.éäñåíéíìééä);

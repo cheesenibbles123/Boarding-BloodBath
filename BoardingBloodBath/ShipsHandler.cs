@@ -1,6 +1,6 @@
 ﻿using System;
 using UnityEngine;
-using BWModLoader;
+using ModLoader;
 using Harmony;
 
 namespace BoardingBloodbath
@@ -15,6 +15,7 @@ namespace BoardingBloodbath
         }
         public static void spawnShip(Ships ship, int team)
         {
+            Log.log("Spawning ship " + ship + " for team " + team);
             if (GameMode.Instance.teamIsShip[team] || GameMode.Instance.winning)
             {
                 return;
